@@ -85,7 +85,8 @@ class MONES(object):
         self.n_population = n_population
         self.n_runs = n_runs
         self.ref_point = ref_point
-        self.n_objectives = len(make_env().reward_space.low)
+        env = make_env()
+        self.n_objectives = 1 if not hasattr(env, 'reward_space') else len(env.reward_space.low)
 
         self.logdir = logdir
         self.logger = Logger(self.logdir)
@@ -95,6 +96,9 @@ class MONES(object):
             self.indicator = lambda points, ref=ref_point: indicator_hypervolume(points, ref)
         elif indicator == 'non_dominated':
             self.indicator = indicator_non_dominated
+        elif indicator == 'single_objective':
+            self.indicator = lambda x: x.flatten()
+            self.n_objectives = 1
         else:
             raise ValueError('unknown indicator, choose between hypervolume and non_dominated')
     
